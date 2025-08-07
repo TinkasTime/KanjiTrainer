@@ -13,12 +13,11 @@ import javax.swing.JPanel;
 
 public class CanvasPanel extends JPanel {
 
-    private static final Color DRAW_COLOR = Color.BLACK;
-    private static final Color ERASE_COLOR = Color.WHITE;
     private static final Color BACKGROUND_COLOR = Color.WHITE;
+    private static final Color DRAW_COLOR = Color.BLACK;
 
-    private List<CanvasStroke> drawingStrokes = new ArrayList<>();
-
+    private List<CanvasStroke> drawingStrokes;
+    private CanvasStroke currentStroke = null;
     private DrawingMode currentCanvasMode = DrawingMode.NONE;
 
     private Runnable undoButtonCallback;
@@ -27,11 +26,6 @@ public class CanvasPanel extends JPanel {
     public CanvasPanel() {
         setDrawingMode(currentCanvasMode);
 
-        CanvasMouseHandler mouseHandler = new CanvasMouseHandler(this, () -> {
-            if (undoButtonCallback != null) {
-                undoButtonCallback.run();
-            }
-        });
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
     }
@@ -59,9 +53,6 @@ public class CanvasPanel extends JPanel {
 
     public void addDrawingStroke(CanvasStroke stroke) {
         this.drawingStrokes.add(stroke);
-        if (strokeFinishedCallback != null) {
-            strokeFinishedCallback.run();
-        }
     }
 
     public List<CanvasStroke> getDrawingStrokes() {

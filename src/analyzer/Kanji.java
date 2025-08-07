@@ -6,12 +6,12 @@ public class Kanji {
     
     private String character;
     private int strokeCount;
-    private List<Integer> strokeDirections;
+    private List<StrokeType> strokeTypes;
 
-    public Kanji(String character, int strokeCount, List<Integer> strokeDirections) {
+    public Kanji(String character, int strokeCount, List<StrokeType> strokeTypes) {
         this.character = character;
         this.strokeCount = strokeCount;
-        this.strokeDirections = strokeDirections;
+        this.strokeTypes = strokeTypes;
     }
 
     public String getCharacter() {
@@ -22,7 +22,7 @@ public class Kanji {
         return strokeCount;
     }
 
-    public List<Integer> getStrokeDirections() {
-        return strokeDirections;
+    public List<StrokeType> getStrokeTypes() {
+        return strokeTypes;
     }
 }
