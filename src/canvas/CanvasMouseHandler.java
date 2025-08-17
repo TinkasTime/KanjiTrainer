@@ -2,14 +2,10 @@ package canvas;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Point;
 
 public class CanvasMouseHandler extends MouseAdapter {
 
     private CanvasPanel canvasPanel;
-    private CanvasStroke currentStroke = null;
-
-    private Runnable undoButtonCallback;
 
     public CanvasMouseHandler(CanvasPanel panel) {
         this.canvasPanel = panel;
@@ -22,19 +18,21 @@ public class CanvasMouseHandler extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         // linke Maustaste = MouseEvent.BUTTON1
-        if (e.getButton() == MouseEvent.BUTTON1 && canvasPanel.getCurrentCanvasMode() == DrawingMode.PEN) {
-            currentStroke = new CanvasStroke(canvasPanel.getCurrentCanvasMode());
-            currentStroke.addPoint(e.getPoint());
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (canvasPanel.getPenMode()) {
+                canvasPanel.startNewStroke(e.getPoint());
+                canvasPanel.repaint();
+            }
         }
     }
 
     /**
-     * Wenn gerade ein Strich gemalt wird, füge weiter Points hinzu und repaint
+     * Wenn der Pen Mode aktiv ist, füge weiter Points hinzu und repaint
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (currentStroke != null) {
-            currentStroke.addPoint(e.getPoint());
+        if (canvasPanel.getPenMode()) {
+            canvasPanel.addPointToCurrentStroke(e.getPoint());
             canvasPanel.repaint();
         }
     }
@@ -47,10 +45,12 @@ public class CanvasMouseHandler extends MouseAdapter {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1 && currentStroke != null) {
-            canvasPanel.addDrawingStroke(currentStroke);
-            currentStroke = null;
-            canvasPanel.repaint();
+        // linke Maustaste = MouseEvent.BUTTON1
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (canvasPanel.getPenMode()) {
+                canvasPanel.finalizeCurrentStroke();
+                canvasPanel.repaint();
+            }
         }
     }
 }

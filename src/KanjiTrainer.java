@@ -1,5 +1,7 @@
 import javax.swing.SwingUtilities;
 
+import canvas.SimpleCanvas;
+
 public class KanjiTrainer {
 
     public static void main(String[] args) {
