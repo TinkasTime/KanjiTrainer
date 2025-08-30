@@ -13,7 +13,8 @@ import javax.swing.JPanel;
 
 public class CanvasPanel extends JPanel {
 
-    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    private static final Color paper = Color.decode("#E9E5CE");
+    private static final Color BACKGROUND_COLOR = paper;
     private static final Color DRAW_COLOR = Color.BLACK;
     private static final BasicStroke STROKE_THICKNESS = new BasicStroke(2.0f);
 
@@ -21,7 +22,7 @@ public class CanvasPanel extends JPanel {
     private CanvasStroke currentStroke;
     private boolean penActive;
 
-    private Runnable strokeFinishedCallback;
+    private Runnable strokeUpdateCallback;
 
     public CanvasPanel() {
         this.setBackground(BACKGROUND_COLOR);
@@ -59,6 +60,7 @@ public class CanvasPanel extends JPanel {
     public void clearDrawing() {
         drawingStrokes.clear();
         repaint();
+        fireStrokeUpdateCallback();
     }
 
     public boolean hasStrokes() {
@@ -69,6 +71,7 @@ public class CanvasPanel extends JPanel {
         if (!drawingStrokes.isEmpty()) {
             drawingStrokes.remove(drawingStrokes.size()-1);
             repaint();
+            fireStrokeUpdateCallback();
         }
     }
 
@@ -89,9 +92,7 @@ public class CanvasPanel extends JPanel {
         if (currentStroke != null) {
             drawingStrokes.add(currentStroke);
             currentStroke = null;
-
-            if (strokeFinishedCallback != null)
-                strokeFinishedCallback.run();
+            fireStrokeUpdateCallback();
         }
     }
 
@@ -136,10 +137,16 @@ public class CanvasPanel extends JPanel {
 
     // Callbacks
     /**
-     * Soll Analyse der Striche starten, wenn Strich gemalt wurde
+     * Werde aktiv, wenn sich die DrawingStroke-Liste ändert
      */
-    public void setStrokeFinishedCallback(Runnable callback) {
-        this.strokeFinishedCallback = callback;
+    private void fireStrokeUpdateCallback() {
+        if (strokeUpdateCallback != null) {
+            strokeUpdateCallback.run();
+        }
+    }
+
+    public void setStrokeUpdateCallback(Runnable callback) {
+        this.strokeUpdateCallback = callback;
     }
 
 }

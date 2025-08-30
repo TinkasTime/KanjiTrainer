@@ -8,45 +8,38 @@ import canvas.CanvasStroke;
 
 public class KanjiAnalyzer {
 
-    private List<Kanji> kanjiDatabase;
+    private KanjiDatabase kanjiDatabase;
 
     public KanjiAnalyzer() {
-        System.out.println("KanjiAnalyzer wurde initialisiert.");
-        initializedKanjiDatabase();
-    }
-
-    private void initializedKanjiDatabase() {
-        kanjiDatabase = new ArrayList<>();
-        kanjiDatabase.add(new Kanji("一", 1, List.of(StrokeType.HORIZONTAL)));
-        kanjiDatabase.add(new Kanji("二", 2, List.of(StrokeType.HORIZONTAL, StrokeType.HORIZONTAL)));
-        kanjiDatabase.add(new Kanji("三", 3, List.of(StrokeType.HORIZONTAL, StrokeType.HORIZONTAL, StrokeType.HORIZONTAL)));
-        kanjiDatabase.add(new Kanji("十", 2, List.of(StrokeType.HORIZONTAL, StrokeType.VERTICAL)));
-        kanjiDatabase.add(new Kanji("土", 3, List.of(StrokeType.HORIZONTAL, StrokeType.VERTICAL, StrokeType.HORIZONTAL)));
+        this.kanjiDatabase = new KanjiDatabase();
     }
 
     public String analyzeKanji(List<CanvasStroke> strokes) {
-        String res = "Start der Analyse";
-        
         if (strokes == null || strokes.isEmpty()) {
-            res = "Keine Striche zum Analysieren.";
-            return res;
+            return "Keine Striche zum Analysieren.";
         }
 
-        System.out.println("Analysiere " + strokes.size() + " Striche...");
-        res += "\nAnalysiere " + strokes.size() + " Striche...";
-
-        int drawnStrokeCount = strokes.size();
         List<StrokeType> drawnStrokeTypes = extractStrokeTypes(strokes);
+        List<Kanji> filteredKanji = kanjiDatabase.filterMatchingKanji(drawnStrokeTypes);
 
-        for (Kanji kanji: kanjiDatabase) {
-            if (kanji.getStrokeCount() == drawnStrokeCount && kanji.getStrokeTypes().equals(drawnStrokeTypes)) {
-                res += "\nErkanntes Kanji: " + kanji.getCharacter() + " (Striche: " + drawnStrokeCount + ")";
-                return res;
+        // Szenario 1: Es gibt einen genauen Treffer
+        for (Kanji kanji: filteredKanji) {
+            if (kanji.getStrokeCount() == drawnStrokeTypes.size()) {
+                return "Erkanntes Kanji: " + kanji.getCharacter() + " (Striche: " + drawnStrokeTypes.size() + ")";
             }
         }
 
-        res += "\nKein bekanntes Kanji mit " + drawnStrokeCount + " Strichen gefunden.";
-        return res;
+        // Szenario 2: Es gibt potentielle Kanji, aber keinen exakten
+        // if (!filteredKanji.isEmpty()) {
+        //     String res = "Potenzielle Kanji: ";
+        //     for (Kanji kanji : filteredKanji) {
+        //         res += kanji.getCharacter() + " ";
+        //     }
+        //     return res.trim();
+        // }
+
+        // Szenario 3: Es wurde kein Kanji gefunden
+        return "Kein bekanntes Kanji mit diesen Strichen gefunden.";
     }
 
     private List<StrokeType> extractStrokeTypes(List<CanvasStroke> strokes) {

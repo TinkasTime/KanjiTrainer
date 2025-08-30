@@ -1,11 +1,14 @@
 package canvas;
+
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import analyzer.KanjiAnalyzer;
 
 public class SimpleCanvas {
 
@@ -15,6 +18,8 @@ public class SimpleCanvas {
     private JButton clearButton;
     private JPanel buttonPanel;
     private CanvasPanel canvasPanel;
+    private KanjiAnalyzer kanjiAnalyzer;
+    private JTextArea resultArea;
 
     private static final int FRAME_WIDTH = 800;
     private static final int FRAME_HEIGHT = 600;
@@ -49,8 +54,14 @@ public class SimpleCanvas {
         
         // Canvas
         canvasPanel = new CanvasPanel();
-        canvasPanel.setStrokeFinishedCallback(this::updateUndoButton);
+        canvasPanel.setStrokeUpdateCallback(this::startStrokeAnalysis);
         frame.add(canvasPanel, BorderLayout.CENTER);
+
+        // KanjiAnalyzer mit resultArea
+        kanjiAnalyzer = new KanjiAnalyzer();
+        resultArea = new JTextArea("Analyseresultat hier anzeigen.");
+        resultArea.setEditable(false);
+        frame.add(resultArea, BorderLayout.SOUTH);
 
         frame.setVisible(true);
     }
@@ -59,27 +70,24 @@ public class SimpleCanvas {
         penButton.addActionListener(_ -> {
             canvasPanel.setPenMode(true);
             updatePenButton();
-            updateUndoButton();
         });
 
         clearButton.addActionListener(_ -> {
             canvasPanel.clearDrawing();
             canvasPanel.setPenMode(false);
             updatePenButton();
-            updateUndoButton();
         });
 
         undoButton.addActionListener(_ -> {
             canvasPanel.undoLastStroke();
             canvasPanel.setPenMode(false);
             updatePenButton();
-            updateUndoButton();
         });
     }
 
     /**
-     * Ändere Aktivierung des Pen Buttons.
-     * Ändere den Modus in CanvasPanel.
+     * Ändere Aktivierung des Pen Buttons anhand
+     * des Pen-Modus in CanvasPanel.
      */
     private void updatePenButton() {
         penButton.setEnabled(!canvasPanel.getPenMode());
@@ -87,5 +95,16 @@ public class SimpleCanvas {
 
     private void updateUndoButton() {
         undoButton.setEnabled(canvasPanel.hasStrokes());
+    }
+
+    /**
+     * Nachdem ein Strich abgeschlossen wurde, wird ein Callback
+     * genutzt, um die Strichanalyse zu starten.
+     */
+    private void startStrokeAnalysis() {
+        updateUndoButton();
+
+        String analysisResult = kanjiAnalyzer.analyzeKanji(canvasPanel.getDrawingStrokes());
+        resultArea.setText(analysisResult);
     }
 }
