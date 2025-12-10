@@ -5,5 +5,6 @@ public enum StrokeType {
     VERTICAL,
     ASCEND,
     DESCEND,
+
     UNKNOWN
 }

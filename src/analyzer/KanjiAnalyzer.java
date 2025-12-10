@@ -1,17 +1,24 @@
 package analyzer;
 
 import java.awt.Point;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import canvas.CanvasStroke;
 
 public class KanjiAnalyzer {
 
-    private KanjiDatabase kanjiDatabase;
+    private Map<String, Kanji> Database;
 
     public KanjiAnalyzer() {
-        this.kanjiDatabase = new KanjiDatabase();
+        DatabaseHandler db = new DatabaseHandler();
+        try {
+            db.loadDatabaseFromCSV("src/analyzer/KanjiDatabase.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String analyzeKanji(List<CanvasStroke> strokes) {
@@ -20,14 +27,14 @@ public class KanjiAnalyzer {
         }
 
         List<StrokeType> drawnStrokeTypes = extractStrokeTypes(strokes);
-        List<Kanji> filteredKanji = kanjiDatabase.filterMatchingKanji(drawnStrokeTypes);
+        //List<Kanji> filteredKanji = kanjiDatabase.filterMatchingKanji(drawnStrokeTypes);
 
         // Szenario 1: Es gibt einen genauen Treffer
-        for (Kanji kanji: filteredKanji) {
+        /* for (Kanji kanji: filteredKanji) {
             if (kanji.getStrokeCount() == drawnStrokeTypes.size()) {
                 return "Erkanntes Kanji: " + kanji.getCharacter() + " (Striche: " + drawnStrokeTypes.size() + ")";
             }
-        }
+        } */
 
         // Szenario 2: Es gibt potentielle Kanji, aber keinen exakten
         // if (!filteredKanji.isEmpty()) {

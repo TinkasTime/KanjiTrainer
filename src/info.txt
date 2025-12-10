@@ -1,0 +1,22 @@
+Pattern Recognition:
+
+1. by amount of strokes
+use integers
+Problem: many Kanjis consist of 2 Strokes like 二 and 十
+Solution: difference in direction
+
+2. by 'type' of strokes (and their order)
+2a. horizontal
+2b. vertical
+2c. ascend
+2d. descend
+use enum
+Problem: Kanjis like 土 and 工 have the same order of stroke type
+Solution: usage of structural features
+
+3. by structural features
+3a. intersection
+3b. connection
+3c. above or beneath
+3d. left or right
+use matrix NxN
