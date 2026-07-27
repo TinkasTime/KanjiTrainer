@@ -9,7 +9,7 @@ public class CanvasStroke {
     private List<Point> points;
 
     public CanvasStroke() {
-        this.points = new ArrayList<>();
+        this.points = new ArrayList<Point>();
     }
 
     public List<Point> getPoints() {
@@ -18,5 +18,9 @@ public class CanvasStroke {
 
     public void addPoint(Point p) {
         this.points.add(p);
+    }
+
+    public int getSize() {
+        return points.size();
     }
 }

@@ -54,10 +54,19 @@ public class KanjiAnalyzer {
 
         for (CanvasStroke stroke : strokes) {
             if (isHorizontal(stroke)) {
+                System.out.println("Horizontal detected");
                 strokeTypes.add(StrokeType.HORIZONTAL);
             } else if (isVertical(stroke)) {
+                System.out.println("Vertical detected");
                 strokeTypes.add(StrokeType.VERTICAL);
+            } else if (isAscend(stroke)) {
+                System.out.println("Ascend detected");
+                strokeTypes.add(StrokeType.ASCEND);
+            }  else if (isDescend(stroke)) {
+                System.out.println("Descend detected");
+                strokeTypes.add(StrokeType.DESCEND);
             } else {
+                System.out.println("UNKNOWN detected");
                 strokeTypes.add(StrokeType.UNKNOWN);
             }
         }
@@ -135,4 +144,74 @@ public class KanjiAnalyzer {
         return maxY - minY;
     }
     
+    private boolean isAscend(CanvasStroke stroke) {
+
+        // Zu wenige Punkte für eine Analyse
+        if (stroke.getSize() < 2) return false;
+
+        // lineare Regression
+        int n = stroke.getSize();
+        double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        double x = 0, y = 0;
+
+        for (Point p : stroke.getPoints()) {
+            x = p.getX();
+            y = p.getY();
+
+            sumX += x;
+            sumY += y;
+            sumXY += (x*y);
+            sumX2 += (x*x);
+        }
+
+        // Formel: m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX)
+        double zähler = (n * sumXY) - (sumX * sumY);
+        double nenner = (n * sumX2) - (sumX * sumX);
+
+        // Steigung m
+        double m = zähler / nenner;
+
+        // Koordinatenursprung ist oben links; negative Steigung = steigend
+        if (m < 0) return true;
+
+        return false;
+    }
+
+    private boolean isDescend(CanvasStroke stroke) {
+
+        // Zu wenige Punkte für eine Analyse
+        if (stroke.getSize() < 2) return false;
+
+        // lineare Regression
+        int n = stroke.getSize();
+        double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        double x = 0, y = 0;
+
+        for (Point p : stroke.getPoints()) {
+            x = p.getX();
+            y = p.getY();
+
+            sumX += x;
+            sumY += y;
+            sumXY += (x*y);
+            sumX2 += (x*x);
+        }
+
+        // Formel: m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX)
+        double zähler = (n * sumXY) - (sumX * sumY);
+        double nenner = (n * sumX2) - (sumX * sumX);
+
+        // nenner geht gegen 0
+        if (Math.abs(nenner) < 0.001) {
+            return false; // vertical
+        }
+
+        // Steigung m
+        double m = zähler / nenner;
+
+        if (m > 0) return true;
+
+        return false;
+    }
+
 }
